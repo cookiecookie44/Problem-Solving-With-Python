@@ -1,0 +1,89 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import scipy.linalg as la
+
+rng = np.random.default_rng()
+
+def check(x, y, M, grid_size):
+    
+    while True:
+        if not ((M[x][y])>1):
+            x = rng.integers(0,grid_size)
+            y = rng.integers(0,grid_size)
+        else:
+            return x, y
+        
+        
+        
+def strategy(turn, M, grid_size, xrows, ycolumns, x , y):
+                
+    for i in xrows:
+        for j in ycolumns:
+            if ((M[i][j])>1):
+                return i, j
+            
+    for j in ycolumns:
+        for i in range(grid_size):
+            if ((M[i][j])>1):
+                return i, j
+                
+    for i in xrows:
+        for j in range(grid_size):
+            if ((M[i][j])>1):
+                return i, j
+                
+    x , y = check(x, y, M, grid_size)   
+    return x, y
+    
+    
+    
+def game(grid_size):
+    
+    M = rng.integers(2,3,(grid_size,grid_size))
+    xrows = list(range(grid_size))
+    ycolumns = list(range(grid_size))
+    zerosincolumn = np.array([0]*grid_size)
+    zerosinrow = np.array([0]*grid_size)
+    
+    for turn in range(0,grid_size*grid_size):
+        if turn%2 == 0:   
+            x = rng.integers(0,grid_size)
+            y = rng.integers(0,grid_size)
+            x , y = strategy(turn, M, grid_size, xrows, ycolumns, x, y)
+            M[x][y] = 0
+            
+        else:
+            x = rng.integers(0,grid_size)
+            y = rng.integers(0,grid_size)
+            x, y = check(x, y, M, grid_size)
+            
+            if x in xrows:
+                xrows.remove(x)
+            if y in ycolumns:
+                ycolumns.remove(y)   
+
+            M[x][y] = 1
+    
+    return (la.det(M))
+
+samples = 1000
+det = []
+
+for i in range(samples):
+    detM = game(3)
+    det.append(detM)
+    
+Max = max(det)
+Min = min(det)
+bins = np.arange(Min,Max+2)-0.5
+
+fig,ax = plt.subplots(1,1)
+
+ax.hist(det, bins, density = True,rwidth=0.5)
+ax.set_xlim(Min-1,Max+1)
+ax.set_xticks(np.arange(Min,Max+1))
+plt.grid('on')
+plt.title('Histogram to show our results')
+plt.xlabel('Determinant')
+plt.ylabel('Density')
+plt.show()
