@@ -1,0 +1,90 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+rng = np.random.default_rng()
+
+#randomly adds all liquid to one cup. this is not very useful so is mainly for testing
+def ARand(n, cups):
+    x = rng.integers(0,n)
+    cups[x] += 50
+    print(x)
+    return cups
+
+#below are a few different strategies which I have used at different points during my rubric. Please feel free to test them out by substituting them into my code of the main game
+
+#the strategy of filling alternating cups as in the proof that A can always win for n=10
+def AAlt(n,cups):
+    filled = 0
+    for i in cups:
+        if i>0:
+            filled+=1
+            
+    if filled == 0:
+        for i in range(len(cups)):
+            if i%2 == 0:
+                cups[i]+=50/int((n+1)/2)
+                
+    else:
+        for i in range(len(cups)):
+            if cups[i]>0:
+                cups[i]+=50/filled
+                
+    return cups
+
+#B randomly empties two cups (at least one filled)
+def BRand(n,cups):
+    x = rng.integers(0,n)
+    while cups[x] == 0:
+        x = rng.integers(0,n)
+    cups[x] = 0
+    x = (x+1)%n
+    cups[x] = 0
+    return cups
+
+#B empties the cup which is most filled, and the one one more than it
+def BFull(n, cups):
+    most = 0
+    mostindex = 0
+    for i in range(len(cups)):
+        if cups[i]<most:
+            most = cups[i]
+            mostindex = i
+    cups[mostindex] = 0
+    mostindex = (mostindex+1)%n
+    cups[mostindex] = 0
+    return cups
+            
+def game(n, rounds, trials):
+    winrecord = [0,0]
+    for j in range(trials):
+        cups = [0]*n
+        overflow = False
+        for i in range(rounds):
+        
+            cups = AAlt(n,cups)
+            #print(cups)
+    
+            for i in cups:
+                if i>100:
+                    overflow = True
+    
+            cups = BRand(n,cups)
+            #print(cups)
+        
+        if overflow == True:
+            winrecord[0]+=1
+    
+        else:
+            winrecord[1]+=1
+            
+    return winrecord
+
+
+n = 5
+rounds = 10
+trials = 10000
+winrecord = game(n, rounds, trials)
+print('Out of',trials,'games, using',n,'glasses A will win',winrecord[0],'and B will win',winrecord[1])
+
+plt.bar(['A Wins','B Wins'], winrecord, color ='maroon', 
+        width = 0.4)
