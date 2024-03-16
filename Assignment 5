@@ -1,0 +1,58 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import scipy.linalg as la
+
+#ONLY VALID FOR N ODD
+
+def draw(n):
+    
+    v = 2
+    matrix = np.zeros((n,n))
+    direction = "Right"
+    coordx, coordy = int((n-1)/2),int((n-1)/2)
+    done = False
+    
+    j = 1
+    k=2
+    
+    matrix[coordx, coordy] = 1
+    coordy+=1
+    matrix[coordx, coordy] = 2
+    
+    while done == False:
+            
+        for i in range(j):
+            coordx -= 1
+            v += 1
+            matrix[coordx, coordy] = v
+            
+        j+=2
+        
+        for i in range(k):
+            coordy-=1
+            v+=1
+            matrix[coordx, coordy] = v
+
+        for i in range(k):
+            coordx +=1
+            v+=1
+            matrix[coordx, coordy] = v
+
+        k+=2
+        
+        if v == n**2-(n-1):
+            for i in range(j-1):
+                coordy += 1
+                v += 1
+                matrix[coordx, coordy] = v
+            done = True
+        
+        else:
+            for i in range(j):
+                coordy += 1
+                v += 1
+                matrix[coordx, coordy] = v
+               
+    return matrix
+
+print(draw(7))
